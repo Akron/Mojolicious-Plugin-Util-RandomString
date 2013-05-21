@@ -110,7 +110,6 @@ Mojolicious::Plugin::Util::RandomString - Generate Secure Random Strings in Mojo
   # Mojolicious::Lite
   plugin 'Util::RandomString' => {
     entropy => 256,
-    length  => 18,
     printable => {
       alphabet => '2345679bdfhmnprtFGHJLMNPRT',
       length   => 20
@@ -142,7 +141,7 @@ for reasons of this decision).
 
 This plugin will automatically reseed the random number generator in
 a forking environment like Hypnotoad (although it is untested in other
-forking envoironments).
+forking environments that don't use L<Mojo::IOLoop>).
 
 
 =head1 METHODS
@@ -159,7 +158,6 @@ L<Mojolicious::Plugin> and implements the following new one.
   # Mojolicious::Lite
   plugin 'Util::RandomString' => {
     entropy => 256,
-    length  => 18,
     printable => {
       alphabet => '2345679bdfhmnprtFGHJLMNPRT',
       length   => 20
@@ -170,7 +168,6 @@ L<Mojolicious::Plugin> and implements the following new one.
   {
     'Util-RandomString' => {
       entropy => 256,
-      length  => 18,
       printable => {
         alphabet => '2345679bdfhmnprtFGHJLMNPRT',
         length   => 20
@@ -192,7 +189,7 @@ as part of the configuration file with the key C<Util-RandomString>.
 The default alphabet is base62. This is good for a lot of use cases.
 If you want to generate human readable tokens, you can define another scheme
 (e.g. the above shown 'printable' base26 scheme with a character set with
-visually distinctive character, that also makes it unlikely to generate
+visually distinctive characters, that also makes it unlikely to generate
 insulting words due to missing vocals).
 
 
