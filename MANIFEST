@@ -1,0 +1,6 @@
+lib/Mojolicious/Plugin/Util/RandomString.pm
+t/randomstring.t
+Changes
+MANIFEST
+LICENSE
+Makefile.PL
