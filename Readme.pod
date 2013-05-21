@@ -86,6 +86,9 @@ The name key 'default' can overwrite the default configuration.
 All parameters can be set either on registration or
 as part of the configuration file with the key C<Util-RandomString>.
 
+The plugin can be registered multiple times with different,
+overwriting configurations.
+
 The default alphabet is base62. This is good for a lot of use cases.
 If you want to generate human readable tokens, you can define another scheme
 (e.g. the above shown 'printable' base26 scheme with a character set with

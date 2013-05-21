@@ -39,7 +39,8 @@ my %TEST_RE = (
   default    => qr/^[01]+$/,
   genetic    => qr/^[ACGT]+$/,
   base26     => qr/^[2345679bdfhmnprtFGHJLMNPRT]+$/,
-  numericals => qr/^[2-9]+$/
+  numericals => qr/^[2-9]+$/,
+  hexa       => qr/^[0-9a-f]+$/
 );
 
 my $r;
@@ -121,7 +122,52 @@ $r = $app->random_string('base50');
 ok(!$r, 'base50 string is not fine');
 is(length($r), 0, 'Base50 string as correct length');
 
+$app->plugin('Util::RandomString' => {
+  hexa => {
+    alphabet => ['a'..'f', 0 .. 9],
+    length   => 10
+  }
+});
 
+$r = $app->random_string('numericals', length => 33);
+ok($r, 'Numerical is fine');
+is(length($r), 33, 'Numerical length is fine');
+like($r, $TEST_RE{numericals}, 'Numerical string has correct alphabet');
+
+$r = $app->random_string(alphabet => 'abc');
+ok($r, 'Random String is fine');
+like($r, qr/^[abc]+$/, 'Random string has correct alphabet');
+is(length($r), 15, 'Random string has correct length');
+
+$r = $app->random_string(default => alphabet => 'abc');
+ok($r, 'Random String is fine');
+like($r, qr/^[abc]+$/, 'Random string has correct alphabet');
+is(length($r), 15, 'Random string has correct length');
+
+$r = $app->random_string('genetic', length => 24);
+ok($r, 'Genetic string is fine');
+like($r, $TEST_RE{genetic}, 'Genetic string has correct alphabet');
+is(length($r), 24, 'Genetic string has correct length');
+
+$r = $app->random_string('base26', length => 101);
+ok($r, 'base26 string is fine');
+like($r, $TEST_RE{base26}, 'Base26 string has correct alphabet');
+is(length($r), 101, 'Base26 string as correct length');
+
+$r = $app->random_string('base50', length => 101);
+ok(!$r, 'base50 string is not fine');
+is(length($r), 0, 'Base50 string as correct length');
+
+$r = $app->random_string('base50');
+ok(!$r, 'base50 string is not fine');
+is(length($r), 0, 'Base50 string as correct length');
+
+foreach (0..20) {
+  $r = $app->random_string('hexa');
+  ok($r, 'Hexa string is fine');
+  like($r, $TEST_RE{hexa}, 'Hexa string has correct alphabet');
+  is(length($r), 10, 'Hexa string has correct length');
+};
 
 
 done_testing;

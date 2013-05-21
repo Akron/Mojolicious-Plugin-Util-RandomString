@@ -5,6 +5,8 @@ use Session::Token;
 
 our $VERSION = 0.01;
 
+my (%generator, %default, %setting);
+my $read_config;
 
 # Register plugin
 sub register {
@@ -13,15 +15,17 @@ sub register {
   $param //= {};
 
   # Load parameter from Config file
-  if (my $config_param = $mojo->config('Util-RandomString')) {
-    $param = { %$config_param, %$param };
+  unless ($read_config) {
+    if (my $config_param = $mojo->config('Util-RandomString')) {
+      $param = { %$config_param, %$param };
+    };
+    $read_config = 1;
   };
-
-  my (%generator, %default);
 
   # Reseed on fork
   Mojo::IOLoop->timer(
     0 => sub {
+      my %created = ();
 
       # Create generators by param
       foreach (keys %$param) {
@@ -29,14 +33,19 @@ sub register {
 	# Named generator
 	if (ref $param->{$_} && ref $param->{$_} eq 'HASH') {
 
+	  next if $created{$_};
+
 	  # Construct object
 	  unless ($generator{$_} = Session::Token->new(
 	    %{ $param->{$_} }
 	  )) {
 
+	    # Unable to construct object
 	    $mojo->log->fatal(qq!Unable to create generator for "$_"!);
 	    next;
 	  };
+	  $setting{$_} = { %{ $param->{$_} } };
+	  $created{$_} = 1;
 	}
 
 	# Default parameter
@@ -81,8 +90,8 @@ sub register {
       return Session::Token->new(%default, @_)->get if $gen eq 'default';
 
       # Overwrite specific configuration
-      if ($param->{ $gen }) {
-	return Session::Token->new(% {$param->{ $gen } } , @_)->get;
+      if ($setting{ $gen }) {
+	return Session::Token->new( %{ $setting{ $gen } } , @_)->get;
       };
 
       # Generator is unknown
@@ -185,6 +194,9 @@ The name key 'default' can overwrite the default configuration.
 
 All parameters can be set either on registration or
 as part of the configuration file with the key C<Util-RandomString>.
+
+The plugin can be registered multiple times with different,
+overwriting configurations.
 
 The default alphabet is base62. This is good for a lot of use cases.
 If you want to generate human readable tokens, you can define another scheme
