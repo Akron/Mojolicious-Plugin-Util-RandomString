@@ -131,7 +131,7 @@ Mojolicious::Plugin::Util::RandomString - Generate Secure Random Strings in Mojo
   # Generate string with 'printable' configuration
   <%= random_string 'printable' %>
 
-  # Generate string with 'showable' configuration
+  # Generate string with 'printable' configuration
   # and overwrite length
   <%= random_string 'printable', length => 16 %>
 
