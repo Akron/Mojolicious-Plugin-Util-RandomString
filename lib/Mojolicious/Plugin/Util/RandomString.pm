@@ -8,11 +8,17 @@ our $VERSION = 0.01;
 my (%generator, %default, %setting);
 my $read_config;
 
+
 # Register plugin
 sub register {
   my ($plugin, $mojo, $param) = @_;
 
   $param //= {};
+
+  if (ref $param ne 'HASH') {
+    $mojo->log->fatal(__PACKAGE__ . ' expects a hash reference');
+    return;
+  };
 
   # Load parameter from Config file
   unless ($read_config) {
@@ -111,7 +117,7 @@ __END__
 
 =head1 NAME
 
-Mojolicious::Plugin::Util::RandomString - Generate Secure Random Strings in Mojolicious
+Mojolicious::Plugin::Util::RandomString - Generate Secure Random Strings for Mojolicious
 
 
 =head1 SYNOPSIS
