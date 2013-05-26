@@ -1,13 +1,11 @@
 package Mojolicious::Plugin::Util::RandomString;
 use Mojo::Base 'Mojolicious::Plugin';
-use Mojo::IOLoop;
 use Session::Token;
 
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 
 my (%generator, %default, %setting);
 my $read_config;
-
 
 # Register plugin
 sub register {
@@ -69,9 +67,10 @@ sub register {
   $mojo->helper(
     random_string => sub {
 
+      my $gen = $_[1];
+
       # Start Loop unless it is running
       Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
-      my $gen = $_[1];
 
       # Generate from generator
       unless ($_[2]) {
