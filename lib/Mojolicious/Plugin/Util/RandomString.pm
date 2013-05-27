@@ -103,7 +103,7 @@ sub register {
       $mojo->log->warn(qq!RandomString generator "$gen" is unknown!);
       return '';
     }
-  );
+  ) unless exists $mojo->renderer->helpers->{random_string};
 };
 
 

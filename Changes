@@ -1,3 +1,6 @@
+0.02 2013-05-27
+        - Establish helper only once.
+
 0.01 2013-05-26
         - Initial release on GitHub.
 	- Initial release to CPAN.
