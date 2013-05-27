@@ -178,7 +178,7 @@ L<Mojolicious::Plugin> and implements the following new one.
     }
   };
 
-  Or in your config file
+  # Or in your config file
   {
     'Util-RandomString' => {
       entropy => 256,
