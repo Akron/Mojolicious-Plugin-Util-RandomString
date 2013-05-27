@@ -151,7 +151,7 @@ L<Mojolicious::Plugin::Util::RandomString> is a plugin to generate
 random strings for session tokens, encryption salt, temporary
 password generation etc. Internally it uses L<Session::Token>
 (see L<this comparison|http://neilb.org/reviews/passwords.html#Session::Token>
-for reasons of this decision).
+for reasons for this decision).
 
 This plugin will automatically reseed the random number generator in
 a forking environment like Hypnotoad (although it is untested in other
