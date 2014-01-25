@@ -8,7 +8,7 @@ BEGIN {
 app->config(hypnotoad => {
   listen => ['http://*:1234'],
   workers => 5,
-  accepts => 1,
+  accepts => 5,
   keep_alive_requests => 1
 });
 

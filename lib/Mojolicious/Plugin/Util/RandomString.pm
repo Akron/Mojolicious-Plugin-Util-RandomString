@@ -2,14 +2,18 @@ package Mojolicious::Plugin::Util::RandomString;
 use Mojo::Base 'Mojolicious::Plugin';
 use Session::Token;
 
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 my (%generator, %default, %setting);
 my $read_config;
 
+our $ok;
+
 # Register plugin
 sub register {
   my ($plugin, $mojo, $param) = @_;
+
+  $ok = undef;
 
   $param //= {};
 
@@ -25,6 +29,7 @@ sub register {
     };
     $read_config = 1;
   };
+
 
   # Reseed on fork
   Mojo::IOLoop->timer(
@@ -58,6 +63,9 @@ sub register {
 	};
       };
 
+      # Plugin registered
+      $ok++;
+
       # Create default generator
       $generator{'default'} //= Session::Token->new( %default );
     });
@@ -69,8 +77,8 @@ sub register {
 
       my $gen = $_[1];
 
-      # Start Loop unless it is running
-      Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
+      # One tick for loop until the plugin is registered
+      Mojo::IOLoop->one_tick until Mojo::IOLoop->is_running || $ok;
 
       # Generate from generator
       unless ($_[2]) {
@@ -247,7 +255,7 @@ L<Session::Token>.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2013, L<Nils Diewald|http://nils-diewald.de/>.
+Copyright (C) 2013-2014, L<Nils Diewald|http://nils-diewald.de/>.
 
 This program is free software, you can redistribute it
 and/or modify it under the same terms as Perl.

@@ -1,6 +1,7 @@
 #!/usr/bin/env perl
 use strict;
 use warnings;
+$|++;
 
 BEGIN {
   our @INC;
@@ -35,12 +36,20 @@ $app->plugin('Util::RandomString' => {
   alphabet => [1,0]
 });
 
+$app->plugin('Util::RandomString' => {
+  entropy_test => {
+    alphabet => 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ',
+    entropy => 128
+  }
+});
+
 my %TEST_RE = (
   default    => qr/^[01]+$/,
   genetic    => qr/^[ACGT]+$/,
   base26     => qr/^[2345679bdfhmnprtFGHJLMNPRT]+$/,
   numericals => qr/^[2-9]+$/,
-  hexa       => qr/^[0-9a-f]+$/
+  hexa       => qr/^[0-9a-f]+$/,
+  full       => qr/^[abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ]+$/
 );
 
 my $r;
@@ -168,6 +177,42 @@ foreach (0..20) {
   like($r, $TEST_RE{hexa}, 'Hexa string has correct alphabet');
   is(length($r), 10, 'Hexa string has correct length');
 };
+
+$app->helper(
+  test_random_string => sub {
+    my $c = shift;
+    return $c->random_string('base26');
+  }
+);
+
+ok($r = $app->test_random_string, 'Base26 can be generated');
+like($r, $TEST_RE{base26}, 'Base26 string has correct alphabet');
+
+ok($r = $app->test_random_string, 'Base26 can be repeatedly generated');
+like($r, $TEST_RE{base26}, 'Base26 string has correct alphabet');
+
+get '/path1' => sub {
+  my $c = shift;
+  $c->render(text => $c->random_string('base26'));
+};
+
+get '/path2' => sub {
+  my $c = shift;
+  $c->render(text => $c->test_random_string);
+};
+
+get '/path3' => sub {
+  my $c = shift;
+  $c->render(text => $c->random_string('entropy_test'));
+};
+
+$t->get_ok('/path1')->content_like($TEST_RE{base26});
+$t->get_ok('/path1')->content_like($TEST_RE{base26});
+$t->get_ok('/path2')->content_like($TEST_RE{base26});
+$t->get_ok('/path2')->content_like($TEST_RE{base26});
+$t->get_ok('/path3')->content_like($TEST_RE{full});
+$t->get_ok('/path3')->content_like($TEST_RE{full});
+
 
 
 done_testing;
