@@ -1,5 +1,7 @@
 lib/Mojolicious/Plugin/Util/RandomString.pm
 t/randomstring.t
+t/randomstring_plugin.t
+t/Mojolicious/Plugin/TestRandomString.pm
 Changes
 MANIFEST
 LICENSE
