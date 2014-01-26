@@ -52,9 +52,8 @@ my %TEST_RE = (
   full       => qr/^[abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ]+$/
 );
 
-
 like($app->random_string, $TEST_RE{default}, 'Random string has correct alphabet');
-
+diag $app->_dump_random_string;
 
 my $r;
 my $o = '';
@@ -97,9 +96,9 @@ for (1..2) {
   };
 
   # This is rather unstable - but who cares?
-  ok($fail < 5, 'Not much failing');
+  ok($fail < 2, 'Not much failing');
 
-  Mojo::IOLoop->stop;
+#  Mojo::IOLoop->stop;
 };
 
 $r = $app->random_string('numericals', length => 33);
@@ -150,6 +149,7 @@ like($r, $TEST_RE{numericals}, 'Numerical string has correct alphabet');
 $r = $app->random_string(alphabet => 'abc');
 ok($r, 'Random String is fine');
 like($r, qr/^[abc]+$/, 'Random string has correct alphabet');
+diag $r;
 is(length($r), 15, 'Random string has correct length');
 
 $r = $app->random_string(default => alphabet => 'abc');

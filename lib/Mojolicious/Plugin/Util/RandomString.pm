@@ -2,19 +2,16 @@ package Mojolicious::Plugin::Util::RandomString;
 use Mojo::Base 'Mojolicious::Plugin';
 use Session::Token;
 
-our $VERSION = '0.03_1';
+our $VERSION = '0.03_2';
 
-my (%generator, %setting);
+my (%generator, %setting, %default);
 my ($read_config, $ok);
-
-has 'default';
 
 # Register plugin
 sub register {
   my ($plugin, $mojo, $param) = @_;
 
   $ok = undef;
-
   $param //= {};
 
   if (ref $param ne 'HASH') {
@@ -35,7 +32,7 @@ sub register {
   # Reseed on fork
   Mojo::IOLoop->timer(
     0 => sub {
-      my (%created, %default) = ();
+      my %created = ();
 
       # Create generators by param
       foreach (keys %$param) {
@@ -70,10 +67,18 @@ sub register {
       # Create default generator
       unless (exists $generator{default}) {
 	$generator{default} = Session::Token->new( %default );
-	$plugin->default(\%default);
+
+	# warn $$ . ' ' . $plugin . ' Init S::T with {' . join(', ', map { $_ . ' => ' . (ref $default{$_} ? '[' . join(',', @{$default{$_}}) . ']' : $default{$_})} keys %default) . '}';
       };
     });
 
+
+  # Temporary
+  $mojo->helper(
+    _dump_random_string => sub {
+      return $$ . ' ' . $plugin . '{' . join(', ', map { $_ . ' => ' . (ref $default{$_} ? '[' . join(',', @{$default{$_}}) . ']' : $default{$_})} keys %default) . '}'
+    }
+  );
 
   # Establish 'random_string' helper
   $mojo->helper(
@@ -101,10 +106,10 @@ sub register {
       shift;
 
       # Overwrite default configuration
-      return Session::Token->new(%{$plugin->default}, @_)->get unless @_ % 2;
+      return Session::Token->new(%default, @_)->get unless @_ % 2;
 
       $gen = shift;
-      return Session::Token->new(%{$plugin->default}, @_)->get if $gen eq 'default';
+      return Session::Token->new(%default, @_)->get if $gen eq 'default';
 
       # Overwrite specific configuration
       if ($setting{ $gen }) {
@@ -115,7 +120,7 @@ sub register {
       $mojo->log->warn(qq!RandomString generator "$gen" is unknown!);
       return '';
     }
-  ) unless exists $mojo->renderer->helpers->{random_string};
+  ); # unless exists $mojo->renderer->helpers->{random_string};
 };
 
 
