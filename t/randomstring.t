@@ -52,6 +52,10 @@ my %TEST_RE = (
   full       => qr/^[abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ]+$/
 );
 
+
+like($app->random_string, $TEST_RE{default}, 'Random string has correct alphabet');
+
+
 my $r;
 my $o = '';
 my $fail = 0;

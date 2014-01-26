@@ -2,12 +2,12 @@ package Mojolicious::Plugin::Util::RandomString;
 use Mojo::Base 'Mojolicious::Plugin';
 use Session::Token;
 
-our $VERSION = 0.03;
+our $VERSION = '0.03_1';
 
-my (%generator, %default, %setting);
-my $read_config;
+my (%generator, %setting);
+my ($read_config, $ok);
 
-our $ok;
+has 'default';
 
 # Register plugin
 sub register {
@@ -22,6 +22,7 @@ sub register {
     return;
   };
 
+
   # Load parameter from Config file
   unless ($read_config) {
     if (my $config_param = $mojo->config('Util-RandomString')) {
@@ -34,7 +35,7 @@ sub register {
   # Reseed on fork
   Mojo::IOLoop->timer(
     0 => sub {
-      my %created = ();
+      my (%created, %default) = ();
 
       # Create generators by param
       foreach (keys %$param) {
@@ -67,7 +68,10 @@ sub register {
       $ok++;
 
       # Create default generator
-      $generator{'default'} //= Session::Token->new( %default );
+      unless (exists $generator{default}) {
+	$generator{default} = Session::Token->new( %default );
+	$plugin->default(\%default);
+      };
     });
 
 
@@ -75,10 +79,10 @@ sub register {
   $mojo->helper(
     random_string => sub {
 
-      my $gen = $_[1];
-
       # One tick for loop until the plugin is registered
       Mojo::IOLoop->one_tick until Mojo::IOLoop->is_running || $ok;
+
+      my $gen = $_[1];
 
       # Generate from generator
       unless ($_[2]) {
@@ -97,10 +101,10 @@ sub register {
       shift;
 
       # Overwrite default configuration
-      return Session::Token->new(%default, @_)->get unless @_ % 2;
+      return Session::Token->new(%{$plugin->default}, @_)->get unless @_ % 2;
 
       $gen = shift;
-      return Session::Token->new(%default, @_)->get if $gen eq 'default';
+      return Session::Token->new(%{$plugin->default}, @_)->get if $gen eq 'default';
 
       # Overwrite specific configuration
       if ($setting{ $gen }) {
