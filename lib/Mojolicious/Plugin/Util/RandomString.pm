@@ -2,9 +2,9 @@ package Mojolicious::Plugin::Util::RandomString;
 use Mojo::Base 'Mojolicious::Plugin';
 use Session::Token;
 
-our $VERSION = '0.03_3';
+our $VERSION = '0.04';
 
-our (%generator, %setting, %default);
+our (%generator, %setting, %default, %param);
 our $read_config;
 our $ok = 1;
 
@@ -12,7 +12,6 @@ our $ok = 1;
 sub register {
   my ($plugin, $mojo, $param) = @_;
 
-  $param //= {};
   $ok--;
 
   if (ref $param ne 'HASH') {
@@ -20,11 +19,15 @@ sub register {
     return;
   };
 
+  if ($param) {
+    $param{$_} = $param->{$_} foreach keys %$param;
+  };
+
 
   # Load parameter from Config file
   unless ($read_config) {
     if (my $config_param = $mojo->config('Util-RandomString')) {
-      $param = { %$config_param, %$param };
+      %param =  ( %$config_param, %param );
     };
     $read_config = 1;
   };
@@ -36,29 +39,29 @@ sub register {
       my %created = ();
 
       # Create generators by param
-      foreach (keys %$param) {
+      foreach (keys %param) {
 
 	# Named generator
-	if (ref $param->{$_} && ref $param->{$_} eq 'HASH') {
+	if (ref $param{$_} && ref $param{$_} eq 'HASH') {
 
 	  next if $created{$_};
 
 	  # Construct object
 	  unless ($generator{$_} = Session::Token->new(
-	    %{ $param->{$_} }
+	    %{ $param{$_} }
 	  )) {
 
 	    # Unable to construct object
 	    $mojo->log->fatal(qq!Unable to create generator for "$_"!);
 	    next;
 	  };
-	  $setting{$_} = { %{ $param->{$_} } };
+	  $setting{$_} = { %{$param{$_}} };
 	  $created{$_} = 1;
 	}
 
 	# Default parameter
 	else {
-	  $default{$_} = $param->{$_};
+	  $default{$_} = $param{$_};
 	};
       };
 
@@ -68,29 +71,21 @@ sub register {
       # Create default generator
       unless (exists $generator{default}) {
 	$generator{default} = Session::Token->new( %default );
-#	warn $$ . ' ' . $plugin . ' Init S::T with {' . join(', ', map { $_ . ' => ' . (ref $default{$_} ? '[' . join(',', @{$default{$_}}) . ']' : $default{$_})} keys %default) . '}';
       };
     });
 
 
-  # Temporary
-  $mojo->helper(
-    _dump_random_string => sub {
-      return $$ . ' ' . $plugin . '{' . join(', ', map { $_ . ' => ' . (ref $default{$_} ? '[' . join(',', @{$default{$_}}) . ']' : $default{$_})} keys %default) . '}'
-    }
-  );
-
   # Establish 'random_string' helper
   $mojo->helper(
     random_string => sub {
+      shift;
+      my $gen = $_[0];
 
       # One tick for loop until the plugin is registered
-      Mojo::IOLoop->one_tick until Mojo::IOLoop->is_running || ($ok > 0);
-
-      my $gen = $_[1];
+      Mojo::IOLoop->one_tick until Mojo::IOLoop->is_running || $ok > 0;
 
       # Generate from generator
-      unless ($_[2]) {
+      unless ($_[1]) {
 
 	# Generator doesn't exist
 	if ($gen && !exists $generator{$gen}) {
@@ -99,11 +94,8 @@ sub register {
 	};
 
 	# Get from generator
-	return $generator{$gen // 'default'}->get;
+	return $generator{$gen || 'default'}->get;
       };
-
-      # Controller
-      shift;
 
       # Overwrite default configuration
       return Session::Token->new(%default, @_)->get unless @_ % 2;
