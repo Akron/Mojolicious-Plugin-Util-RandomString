@@ -2,7 +2,7 @@ package Mojolicious::Plugin::Util::RandomString;
 use Mojo::Base 'Mojolicious::Plugin';
 use Session::Token;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 our (%generator, %setting, %default, %param);
 our $read_config;
@@ -259,6 +259,6 @@ L<Session::Token>.
 Copyright (C) 2013-2014, L<Nils Diewald|http://nils-diewald.de/>.
 
 This program is free software, you can redistribute it
-and/or modify it under the same terms as Perl.
+and/or modify it under the terms of the Artistic License version 2.0.
 
 =cut
