@@ -13,8 +13,8 @@ WriteMakefile(
     'Test::More' => 0
   },
   PREREQ_PM => {
-    'Mojolicious' => 3.93,
-    'Session::Token' => 1.007
+    'Mojolicious' => '3.93',
+    'Session::Token' => '1.502'
   },
   LICENSE      => 'artistic_2',
   META_MERGE   => {
