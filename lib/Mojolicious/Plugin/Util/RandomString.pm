@@ -41,28 +41,28 @@ sub register {
       # Create generators by param
       foreach (keys %param) {
 
-	# Named generator
-	if (ref $param{$_} && ref $param{$_} eq 'HASH') {
+        # Named generator
+        if (ref $param{$_} && ref $param{$_} eq 'HASH') {
 
-	  next if $created{$_};
+          next if $created{$_};
 
-	  # Construct object
-	  unless ($generator{$_} = Session::Token->new(
-	    %{ $param{$_} }
-	  )) {
+          # Construct object
+          unless ($generator{$_} = Session::Token->new(
+            %{ $param{$_} }
+          )) {
 
-	    # Unable to construct object
-	    $mojo->log->fatal(qq!Unable to create generator for "$_"!);
-	    next;
-	  };
-	  $setting{$_} = { %{$param{$_}} };
-	  $created{$_} = 1;
-	}
+            # Unable to construct object
+            $mojo->log->fatal(qq!Unable to create generator for "$_"!);
+            next;
+          };
+          $setting{$_} = { %{$param{$_}} };
+          $created{$_} = 1;
+        }
 
-	# Default parameter
-	else {
-	  $default{$_} = $param{$_};
-	};
+        # Default parameter
+        else {
+          $default{$_} = $param{$_};
+        };
       };
 
       # Plugin registered
@@ -70,7 +70,7 @@ sub register {
 
       # Create default generator
       unless (exists $generator{default}) {
-	$generator{default} = Session::Token->new( %default );
+        $generator{default} = Session::Token->new( %default );
       };
     });
 
@@ -87,14 +87,14 @@ sub register {
       # Generate from generator
       unless ($_[1]) {
 
-	# Generator doesn't exist
-	if ($gen && !exists $generator{$gen}) {
-	  $mojo->log->warn(qq!RandomString generator "$gen" is unknown!);
-	  return '';
-	};
+        # Generator doesn't exist
+        if ($gen && !exists $generator{$gen}) {
+          $mojo->log->warn(qq!RandomString generator "$gen" is unknown!);
+          return '';
+        };
 
-	# Get from generator
-	return $generator{$gen || 'default'}->get;
+        # Get from generator
+        return $generator{$gen || 'default'}->get;
       };
 
       # Overwrite default configuration
@@ -105,7 +105,7 @@ sub register {
 
       # Overwrite specific configuration
       if ($setting{ $gen }) {
-	return Session::Token->new( %{ $setting{ $gen } } , @_)->get;
+        return Session::Token->new( %{ $setting{ $gen } } , @_)->get;
       };
 
       # Generator is unknown
