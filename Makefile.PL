@@ -9,7 +9,7 @@ WriteMakefile(
   AUTHOR       => 'Nils Diewald',
   ABSTRACT     => 'Generate Secure Random Strings for Mojolicious',
   VERSION_FROM => 'lib/Mojolicious/Plugin/Util/RandomString.pm',
-  BUILD_REQUIRES => {
+  TEST_REQUIRES => {
     'Test::More' => 0,
     'Test::Memory::Cycle' => '1.06'
   },
