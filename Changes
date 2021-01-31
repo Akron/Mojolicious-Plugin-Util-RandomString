@@ -1,3 +1,6 @@
+0.09 2021-01-31
+        - Catch overwritten entropy or length (hughbarnard++).
+
 0.08 2018-11-01
         - Change permissions for files (manwar++).
 

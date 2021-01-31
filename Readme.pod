@@ -81,7 +81,7 @@ Expects a hash reference containing parameters as defined in
 L<Session::Token> for the default generator.
 To specify named generators, use a name key (other than C<alphabet>,
 C<length>, and C<entropy>) and specify the parameters as a hash reference.
-The name key 'default' can overwrite the default configuration.
+The name key C<default> can overwrite the default configuration.
 
 All parameters can be set either on registration or
 as part of the configuration file with the key C<Util-RandomString>.
@@ -133,7 +133,7 @@ L<Session::Token>.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2013-2018, L<Nils Diewald|http://nils-diewald.de/>.
+Copyright (C) 2013-2021, L<Nils Diewald|http://nils-diewald.de/>.
 
 This program is free software, you can redistribute it
 and/or modify it under the terms of the Artistic License version 2.0.
